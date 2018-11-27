@@ -1,0 +1,10 @@
+*.collabignore
+*.csproj
+*.zip
+*.sln
+.idea/
+Assets/Plugins/
+Temp/
+Library/ShaderCache/
+build/
+Library/
