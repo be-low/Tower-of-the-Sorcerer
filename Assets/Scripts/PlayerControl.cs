@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Billow;
+using UniRx;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -8,13 +11,15 @@ public class PlayerControl : MonoBehaviour
 {
     public float Speed = 20;
     public GameObject Ui;
+    public GameObject[] FloorMaps;
     private Rigidbody2D _rigidbody2D;
     private const float Tolerance = 0.001f;
-    private GameObject[] _currentMap;
+    private GameObject _currMap;
     [SerializeField] private int _floor;
     [SerializeField] private Fighter _fighter;
     [SerializeField] private Dictionary<string, int> _prop;
-    [SerializeField] private Dictionary<int, GameObject[]> _tower;
+    [SerializeField] private Dictionary<int, GameObject> _towerDictionary;
+    [SerializeField] private bool _stairLock;
 
     private static readonly int[] Medicines = {0, 100, 200, 400, 800},
         Gems = {0, 1, 2, 4, 8};
@@ -22,29 +27,29 @@ public class PlayerControl : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        _floor = 1;
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _prop = new Dictionary<string, int>();
-        {
-            _fighter = gameObject.AddComponent<Fighter>();
-            _fighter.Hp = 1000;
-            _fighter.AttachPower = 10;
-            _fighter.DefensivePower = 10;
-            _fighter.CoinCount = 0;
-        }
-        {
-            _currentMap = new GameObject[2];
-            _currentMap[0] = GameObject.FindGameObjectWithTag("WallMap");
-            _currentMap[1] = GameObject.FindGameObjectWithTag("ObjectMap");
-        }
+        _fighter = gameObject.AddComponent<Fighter>();
+
+        _towerDictionary = new Dictionary<int, GameObject>();
+        _currMap = FloorMaps[_floor - 1];
+    }
+
+    private void LoadMap()
+    {
+        _currMap.SetActive(false);
+        _currMap = FloorMaps[_floor - 1];
+        _currMap.SetActive(true);
     }
 
     // Update is called once per frame
     void Update()
     {
-        updateVelocity();
+        UpdateVelocity();
     }
 
-    void updateVelocity()
+    void UpdateVelocity()
     {
         float x = Input.GetAxis("Horizontal"),
             y = Input.GetAxis("Vertical");
@@ -76,32 +81,33 @@ public class PlayerControl : MonoBehaviour
         Debug.Log(otherName);
         if (otherName.StartsWith("Prop"))
         {
-            updateProp(otherName.Substring(4), 1);
+            UpdateProp(otherName.Substring(4), 1);
             Destroy(other.gameObject);
         }
         else if (otherName.StartsWith("Door"))
         {
-            if (tryOpenDoor(otherName.Substring(4)))
+            if (TryOpenDoor(otherName.Substring(4)))
             {
                 Destroy(other.gameObject);
             }
         }
         else if (otherName.StartsWith("Enemy"))
         {
-            if (tryAttack(other.gameObject.GetComponent<Fighter>()))
+            if (TryAttack(other.gameObject.GetComponent<Fighter>()))
             {
-                updateFight();
+//                GetComponent<Animation>().Play("");
+                UpdateFight();
                 Destroy(other.gameObject);
             }
         }
         else if (otherName.StartsWith("Medicine"))
         {
-            eatMedicine(otherName);
+            EatMedicine(otherName);
             Destroy(other.gameObject);
         }
         else if (otherName.StartsWith("Gem"))
         {
-            pickUpGem(otherName);
+            PickUpGem(otherName);
             Destroy(other.gameObject);
         }
     }
@@ -109,48 +115,65 @@ public class PlayerControl : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         string otherName = other.gameObject.name;
-        if (otherName.StartsWith("Stair"))
+        if (otherName.StartsWith("Stair") && !_stairLock)
         {
-            onStair(otherName);
+            _stairLock = true;
+            OnStair(otherName);
         }
     }
 
-    void onStair(string stair)
+    private void OnTriggerExit2D(Collider2D other)
     {
-        if (!_tower.ContainsKey(_floor))
+        string otherName = other.gameObject.name;
+        if (otherName.StartsWith("Stair") && _stairLock)
         {
-            _tower.Add(_floor, _currentMap);
+            _stairLock = false;
+        }
+    }
+
+    void OnStair(string stair)
+    {
+        if (!_towerDictionary.ContainsKey(_floor))
+        {
+            _towerDictionary.Add(_floor, _currMap);
         }
         else
         {
-            _tower[_floor] = _currentMap;
+            _towerDictionary[_floor] = _currMap;
         }
 
         string d = stair.Substring(5);
         switch (d)
         {
             case "Up":
-                upStair();
+                UpStair();
                 break;
             case "Down":
-                downStair();
+                DownStair();
                 break;
         }
+
+        LoadMap();
+        var pos_ = transform.position;
+        var pos = new Vector2Int((int) pos_.x, (int) pos_.y);
+        
     }
 
-    void upStair()
+    void UpStair()
     {
         // TODO do up stair
         _floor++;
+        Debug.Log(_floor);
     }
 
-    void downStair()
+    void DownStair()
     {
         // TODO do down stair
         _floor--;
+        Debug.Log(_floor);
     }
 
-    void pickUpGem(string gem)
+    void PickUpGem(string gem)
     {
         string type = gem.Substring(3, gem.Length - 5);
         int level = int.Parse(gem.Substring(gem.Length - 1));
@@ -167,16 +190,16 @@ public class PlayerControl : MonoBehaviour
                 break;
         }
 
-        updateFight();
+        UpdateFight();
     }
 
-    void eatMedicine(string medicine)
+    void EatMedicine(string medicine)
     {
         int level;
         if (int.TryParse(medicine.Substring(9), out level))
         {
             _fighter.Hp += Medicines[level];
-            updateFight();
+            UpdateFight();
         }
         else
         {
@@ -184,25 +207,25 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    bool tryOpenDoor(string clr)
+    bool TryOpenDoor(string clr)
     {
         string k = "Key" + clr;
         if (!_prop.ContainsKey(k) || _prop[k] <= 0) return false;
-        updateProp(k, -1);
+        UpdateProp(k, -1);
         return true;
     }
 
-    bool tryAttack(Fighter other)
+    bool TryAttack(Fighter other)
     {
         return _fighter.BattleWith(other);
     }
 
-    void updateFight()
+    void UpdateFight()
     {
         Ui.SendMessage("UpdateFighter", _fighter);
     }
 
-    void updateProp(string key, int inc)
+    void UpdateProp(string key, int inc)
     {
         int count;
         if (_prop.TryGetValue(key, out count))
