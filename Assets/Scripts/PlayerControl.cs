@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using Billow;
-using UniRx;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.Tilemaps;
 
 public class PlayerControl : MonoBehaviour
 {
@@ -15,6 +13,7 @@ public class PlayerControl : MonoBehaviour
     private Rigidbody2D _rigidbody2D;
     private const float Tolerance = 0.001f;
     private GameObject _currMap;
+    private static Vector3Int[] Directions = {Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right};
     [SerializeField] private int _floor;
     [SerializeField] private Fighter _fighter;
     [SerializeField] private Dictionary<string, int> _prop;
@@ -118,7 +117,9 @@ public class PlayerControl : MonoBehaviour
         if (otherName.StartsWith("Stair") && !_stairLock)
         {
             _stairLock = true;
-            OnStair(otherName);
+            var ForeWall = GameObject.FindGameObjectWithTag("WallMap").GetComponent<Tilemap>();
+//            var pos = ForeWall.WorldToCell(other.transform.position);
+            OnStair(otherName, other.transform.position);
         }
     }
 
@@ -131,7 +132,7 @@ public class PlayerControl : MonoBehaviour
         }
     }
 
-    void OnStair(string stair)
+    void OnStair(string stair, Vector3 pos)
     {
         if (!_towerDictionary.ContainsKey(_floor))
         {
@@ -154,9 +155,18 @@ public class PlayerControl : MonoBehaviour
         }
 
         LoadMap();
-        var pos_ = transform.position;
-        var pos = new Vector2Int((int) pos_.x, (int) pos_.y);
-        
+
+//        var tilemap = GameObject.FindGameObjectWithTag("WallMap").GetComponent<Tilemap>();
+//        Vector3Int dist = pos;
+//        foreach (var direction in Directions)
+//        {
+//            dist = pos + direction;
+//            var x = tilemap.GetTile(pos);
+//            if (x == null)
+//                break;
+//        }
+
+        transform.position = pos;
     }
 
     void UpStair()
