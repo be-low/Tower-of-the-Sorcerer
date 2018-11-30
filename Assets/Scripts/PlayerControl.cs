@@ -134,14 +134,14 @@ public class PlayerControl : MonoBehaviour
 
     void OnStair(string stair, Vector3 pos)
     {
-        if (!_towerDictionary.ContainsKey(_floor))
-        {
-            _towerDictionary.Add(_floor, _currMap);
-        }
-        else
-        {
-            _towerDictionary[_floor] = _currMap;
-        }
+        //if (!_towerDictionary.ContainsKey(_floor))
+        //{
+        //    _towerDictionary.Add(_floor, _currMap);
+        //}
+        //else
+        //{
+        //    _towerDictionary[_floor] = _currMap;
+        //}
 
         string d = stair.Substring(5);
         switch (d)
