@@ -6,6 +6,14 @@ TagManager:
   tags:
   - WallMap
   - ObjectMap
+  - Map
+  - Wall
+  - Wallts
+  - bb
+  - bb1
+  - bb2
+  - bb3
+  - bb4
   layers:
   - Default
   - TransparentFX
