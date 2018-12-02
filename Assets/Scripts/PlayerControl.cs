@@ -7,12 +7,17 @@ using UnityEngine.Tilemaps;
 
 public class PlayerControl : MonoBehaviour
 {
+    public float flag;
     public float Speed = 20;
     public GameObject Ui;
+    public GameObject[] MoWang;
+    public GameObject Dialog;
+    public GameObject Dialog1;
     public GameObject[] FloorMaps;
     private Rigidbody2D _rigidbody2D;
     private const float Tolerance = 0.001f;
     private GameObject _currMap;
+    private GameObject currMap;
     private static Vector3Int[] Directions = {Vector3Int.up, Vector3Int.down, Vector3Int.left, Vector3Int.right};
     [SerializeField] private int _floor;
     [SerializeField] private Fighter _fighter;
@@ -33,10 +38,12 @@ public class PlayerControl : MonoBehaviour
 
         _towerDictionary = new Dictionary<int, GameObject>();
         _currMap = FloorMaps[_floor - 1];
+        currMap = FloorMaps[2];
     }
 
     private void LoadMap()
     {
+        currMap.SetActive(false);
         _currMap.SetActive(false);
         _currMap = FloorMaps[_floor - 1];
         _currMap.SetActive(true);
@@ -45,6 +52,43 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+        if (Input.GetKey(KeyCode.Space))
+        {
+            
+            Dialog.SetActive(false);
+            //Dialog1.SetActive(false);
+            if (Dialog.activeSelf==false)
+            {
+                Destroy(GameObject.FindGameObjectWithTag("bb"));
+                Destroy(GameObject.FindGameObjectWithTag("bb1"));
+                Destroy(GameObject.FindGameObjectWithTag("bb2"));
+                Destroy(GameObject.FindGameObjectWithTag("bb3"));
+                Destroy(GameObject.FindGameObjectWithTag("bb4"));
+                currMap = FloorMaps[2];
+                currMap.SetActive(false);
+                currMap = FloorMaps[1];
+                currMap.SetActive(true);
+                Vector2 newVector = transform.position;
+                newVector.x = -1.49f;
+                newVector.y = -1.49f;
+                transform.position = newVector;
+                _floor = 2;
+            }
+           
+
+        }
+        if (Input.GetKey(KeyCode.Tab))
+        {
+            flag = 0;
+            
+            Dialog1.SetActive(false);
+            if (Dialog1.activeSelf == false)
+            {
+                Destroy(GameObject.FindGameObjectWithTag("Wall"));
+            }
+
+        }
         UpdateVelocity();
     }
 
@@ -83,6 +127,21 @@ public class PlayerControl : MonoBehaviour
             UpdateProp(otherName.Substring(4), 1);
             Destroy(other.gameObject);
         }
+        else if (otherName.StartsWith("NPC"))
+        {
+            Dialog1.SetActive(true);
+ 
+        }
+        else if (otherName.StartsWith("Wall"))
+        {
+            for(int i = 0; i < MoWang.Length;i++ )
+            {
+                MoWang[i].SetActive(true);
+            }
+            Destroy(GameObject.FindGameObjectWithTag("Wallts"));
+            Dialog.SetActive(true);
+
+        }
         else if (otherName.StartsWith("Door"))
         {
             if (TryOpenDoor(otherName.Substring(4)))
@@ -94,7 +153,7 @@ public class PlayerControl : MonoBehaviour
         {
             if (TryAttack(other.gameObject.GetComponent<Fighter>()))
             {
-//                GetComponent<Animation>().Play("");
+                GetComponent<Animation>().Play("fightleft");
                 UpdateFight();
                 Destroy(other.gameObject);
             }

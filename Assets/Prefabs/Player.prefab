@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 114864487675278584}
   - component: {fileID: 50112328254810092}
   - component: {fileID: 70600381158631246}
+  - component: {fileID: 111147488600559224}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -97,6 +98,21 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!111 &111147488600559224
+Animation:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1079399287269672}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Animation: {fileID: 7400000, guid: 1e88265405af3f846b36653093e3ef34, type: 2}
+  m_Animations:
+  - {fileID: 7400000, guid: 1e88265405af3f846b36653093e3ef34, type: 2}
+  m_WrapMode: 0
+  m_PlayAutomatically: 0
+  m_AnimatePhysics: 0
+  m_CullingType: 0
 --- !u!114 &114864487675278584
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -108,7 +124,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3e488629fa9feb14b85a309a2ffa5610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 500
+  Speed: 1000
+  Ui: {fileID: 0}
+  FloorMaps:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  _floor: 0
+  _fighter: {fileID: 0}
+  _stairLock: 0
 --- !u!212 &212474846145198362
 SpriteRenderer:
   m_ObjectHideFlags: 1
@@ -141,8 +165,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1328779649
-  m_SortingLayer: 2
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 50f0b316db1917c4db0089cdb0180eec, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -153,5 +177,5 @@ SpriteRenderer:
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
+  m_MaskInteraction: 2
   m_SpriteSortPoint: 0
