@@ -22,13 +22,13 @@ public class PlayerControl : MonoBehaviour
     [SerializeField] private int _floor;
     [SerializeField] private Fighter _fighter;
     [SerializeField] private Dictionary<string, int> _prop;
-    [SerializeField] private Dictionary<int, GameObject> _towerDictionary;
+
     [SerializeField] private bool _stairLock;
+//    [SerializeField] private Dictionary<int, GameObject> _towerDictionary=new Dictionary<int, GameObject>();
 
     private static readonly int[] Medicines = {0, 100, 200, 400, 800},
         Gems = {0, 1, 2, 4, 8};
 
-    // Use this for initialization
     void Start()
     {
         _floor = 1;
@@ -36,7 +36,6 @@ public class PlayerControl : MonoBehaviour
         _prop = new Dictionary<string, int>();
         _fighter = gameObject.AddComponent<Fighter>();
 
-        _towerDictionary = new Dictionary<int, GameObject>();
         _currMap = FloorMaps[_floor - 1];
         currMap = FloorMaps[2];
     }
@@ -52,13 +51,11 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (Input.GetKey(KeyCode.Space))
         {
-            
             Dialog.SetActive(false);
             //Dialog1.SetActive(false);
-            if (Dialog.activeSelf==false)
+            if (Dialog.activeSelf == false)
             {
                 Destroy(GameObject.FindGameObjectWithTag("bb"));
                 Destroy(GameObject.FindGameObjectWithTag("bb1"));
@@ -75,20 +72,19 @@ public class PlayerControl : MonoBehaviour
                 transform.position = newVector;
                 _floor = 2;
             }
-           
-
         }
+
         if (Input.GetKey(KeyCode.Tab))
         {
             flag = 0;
-            
+
             Dialog1.SetActive(false);
             if (Dialog1.activeSelf == false)
             {
                 Destroy(GameObject.FindGameObjectWithTag("Wall"));
             }
-
         }
+
         UpdateVelocity();
     }
 
@@ -130,17 +126,16 @@ public class PlayerControl : MonoBehaviour
         else if (otherName.StartsWith("NPC"))
         {
             Dialog1.SetActive(true);
- 
         }
         else if (otherName.StartsWith("Wall"))
         {
-            for(int i = 0; i < MoWang.Length;i++ )
+            for (int i = 0; i < MoWang.Length; i++)
             {
                 MoWang[i].SetActive(true);
             }
+
             Destroy(GameObject.FindGameObjectWithTag("Wallts"));
             Dialog.SetActive(true);
-
         }
         else if (otherName.StartsWith("Door"))
         {
@@ -153,9 +148,10 @@ public class PlayerControl : MonoBehaviour
         {
             if (TryAttack(other.gameObject.GetComponent<Fighter>()))
             {
-                GetComponent<Animation>().Play("fightleft");
                 UpdateFight();
-                Destroy(other.gameObject);
+                var animator = GetComponent<Animator>();
+                animator.SetTrigger("Fight");
+                Destroy(other.gameObject, 1);
             }
         }
         else if (otherName.StartsWith("Medicine"))
