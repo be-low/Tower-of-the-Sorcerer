@@ -15114,6 +15114,11 @@ Prefab:
       propertyPath: Dialog2
       value: 
       objectReference: {fileID: 2071960260}
+    - target: {fileID: 114864487675278584, guid: 51061314ec3ca7247860bea85e116289,
+        type: 2}
+      propertyPath: Speed
+      value: 200
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 51061314ec3ca7247860bea85e116289, type: 2}
   m_IsPrefabAsset: 0

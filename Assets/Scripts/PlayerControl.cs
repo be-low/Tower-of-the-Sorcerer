@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 public class PlayerControl : MonoBehaviour
 {
-    public float flag;
+    public int status;
     public float Speed = 20;
     public GameObject Ui;
     public GameObject[] MoWang;
@@ -28,7 +28,7 @@ public class PlayerControl : MonoBehaviour
 //    [SerializeField] private Dictionary<int, GameObject> _towerDictionary=new Dictionary<int, GameObject>();
 
     private static readonly int[] Medicines = {0, 100, 200, 400, 800},
-        Gems = {0, 1, 2, 4,100 };
+        Gems = {0, 1, 2, 4, 100};
 
     void Start()
     {
@@ -52,7 +52,7 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.anyKeyDown && status == 1)
         {
             Dialog.SetActive(false);
             //Dialog1.SetActive(false);
@@ -72,18 +72,25 @@ public class PlayerControl : MonoBehaviour
                 newVector.y = -1.49f;
                 transform.position = newVector;
                 _floor = 2;
+                status = 0;
             }
         }
 
-        if (Input.GetKey(KeyCode.Tab))
+        if (Input.anyKeyDown && status == 2)
         {
-            flag = 0;
-
             Dialog1.SetActive(false);
             if (Dialog1.activeSelf == false)
             {
                 Destroy(GameObject.FindGameObjectWithTag("Wall"));
             }
+
+            status = 0;
+        }
+
+        if (Input.anyKeyDown && status == 3)
+        {
+            Dialog2.SetActive(false);
+            status = 0;
         }
 
         UpdateVelocity();
@@ -127,11 +134,12 @@ public class PlayerControl : MonoBehaviour
         else if (otherName.StartsWith("NPC"))
         {
             Dialog1.SetActive(true);
-            
+            status = 2;
         }
         else if (otherName.StartsWith("Princess"))
         {
             Dialog2.SetActive(true);
+            status = 3;
         }
         else if (otherName.StartsWith("Wall"))
         {
@@ -140,6 +148,7 @@ public class PlayerControl : MonoBehaviour
                 MoWang[i].SetActive(true);
             }
 
+            status = 1;
             Destroy(GameObject.FindGameObjectWithTag("Wallts"));
             Dialog.SetActive(true);
         }
