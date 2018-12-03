@@ -13,6 +13,7 @@ public class PlayerControl : MonoBehaviour
     public GameObject[] MoWang;
     public GameObject Dialog;
     public GameObject Dialog1;
+    public GameObject Dialog2;
     public GameObject[] FloorMaps;
     private Rigidbody2D _rigidbody2D;
     private const float Tolerance = 0.001f;
@@ -27,7 +28,7 @@ public class PlayerControl : MonoBehaviour
 //    [SerializeField] private Dictionary<int, GameObject> _towerDictionary=new Dictionary<int, GameObject>();
 
     private static readonly int[] Medicines = {0, 100, 200, 400, 800},
-        Gems = {0, 1, 2, 4, 8};
+        Gems = {0, 1, 2, 4,100 };
 
     void Start()
     {
@@ -126,6 +127,11 @@ public class PlayerControl : MonoBehaviour
         else if (otherName.StartsWith("NPC"))
         {
             Dialog1.SetActive(true);
+            
+        }
+        else if (otherName.StartsWith("Princess"))
+        {
+            Dialog2.SetActive(true);
         }
         else if (otherName.StartsWith("Wall"))
         {
